@@ -1,0 +1,42 @@
+group "twitterStream"
+version "1"
+
+buildscript {
+    ext {
+        springBootVersion = '1.5.10.RELEASE'
+    }
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'org.springframework.boot'
+
+sourceCompatibility = 1.8
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'spring.Application'
+    }
+    version = 1.0
+}
+configurations {
+    providedRuntime
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile('org.springframework.boot:spring-boot-starter-web')
+    compile('org.springframework.kafka:spring-kafka')
+    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
+    compile group: 'org.twitter4j', name: 'twitter4j-core', version: '4.0.6'
+    compile group: 'org.twitter4j', name: 'twitter4j-stream', version: '4.0.6'
+    compile group: 'org.twitter4j', name: 'twitter4j-examples', version: '4.0.6'
+}
