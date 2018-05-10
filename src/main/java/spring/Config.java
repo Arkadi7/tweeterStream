@@ -1,7 +1,7 @@
 package spring;
 
 import kafka.KafkaProducer;
-import model.Tweet;
+import model.myDTO;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Value;
@@ -9,6 +9,7 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
@@ -19,6 +20,7 @@ import twitter4j.conf.ConfigurationBuilder;
 import java.util.HashMap;
 import java.util.Map;
 
+@EnableKafka
 @Configuration
 @EnableAutoConfiguration
 @PropertySource("classpath:/application.properties")
@@ -32,26 +34,25 @@ public class Config {
   private String token;
   @Value("${twitter.AccessTokenSecret}")
   private String tokenSecret;
-  @Value("${kafka.out.topic}")
+  @Value("${kafka.in.save.topic}")
   private String kafkaOutTopic;
 
   @Bean
-  public KafkaTemplate<String, Tweet> kafkaTemplate(
+  public KafkaTemplate<String, myDTO> kafkaTemplate(
     @Value("${kafka.bootstrap-servers}") String bootstrap) {
 
     Map<String, Object> producerConfigs = new HashMap<>();
     producerConfigs.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrap);
-    producerConfigs.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,
-                        StringSerializer.class.getName());
+    producerConfigs.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
     producerConfigs.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
 
-    ProducerFactory<String, Tweet> producerFactory = new DefaultKafkaProducerFactory<>(
+    ProducerFactory<String, myDTO> producerFactory = new DefaultKafkaProducerFactory<>(
       producerConfigs);
     return new KafkaTemplate<>(producerFactory);
   }
 
   @Bean
-  public KafkaProducer kafkaProducer(KafkaTemplate<String, Tweet> kafkaTemplate,
+  public KafkaProducer kafkaProducer(KafkaTemplate<String, myDTO> kafkaTemplate,
                                      @Value("${kafka.in.save.topic}")
                                        String kafkaOutTopic) {
 
@@ -62,7 +63,9 @@ public class Config {
   public TwitterKafkaServiceTesting twitterKafkaServiceTesting(KafkaProducer kafkaProducer) {
 
     ConfigurationBuilder configuration = new ConfigurationBuilder();
-    configuration.setDebugEnabled(true)
+    configuration
+      .setDebugEnabled(true)
+      .setJSONStoreEnabled(true)
       .setOAuthConsumerKey(key)
       .setOAuthConsumerSecret(keySecret)
       .setOAuthAccessToken(token)

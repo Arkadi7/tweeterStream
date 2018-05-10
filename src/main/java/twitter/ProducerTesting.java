@@ -1,9 +1,13 @@
 package twitter;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.MapType;
 import kafka.KafkaProducer;
-import model.Tweet;
+import model.myDTO;
 import twitter4j.*;
 
+import java.io.IOException;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -21,8 +25,21 @@ public class ProducerTesting implements UserStreamListener {
   public void onStatus(Status status) {
 
     System.out.println("onStatus @" + status.getUser().getScreenName() + " - " + status.getText());
+    //Tweet tweet = new Tweet(status.getText(), status.getCreatedAt().toString());
+    Map<String, Object> data = null;
+    try {
+      String string = new JSONObject(TwitterObjectFactory.getRawJSON(status)).toString();
+      final ObjectMapper mapper = new ObjectMapper();
+      final MapType type = mapper.getTypeFactory().constructMapType(
+        Map.class, String.class, Object.class);
 
-    Tweet my = new Tweet(status.getId() + "", status.getText());
+      data = mapper.readValue(string, type);
+    }
+    catch (IOException | JSONException e) {
+      e.printStackTrace();
+    }
+    String userId = "" + status.getUser().getId() + "|" + status.getCreatedAt().getTime();
+    myDTO my = new myDTO(userId, data);
     this.kafkaProducer.tweet(my);
     try {
       latch.await(0, TimeUnit.SECONDS);
@@ -112,12 +129,12 @@ public class ProducerTesting implements UserStreamListener {
 
   public void onUserDeletion(long deletedUser) {
 
-    System.out.println("onUserDeletion user:@" + deletedUser);
+    System.out.println("onUserDeletion User:@" + deletedUser);
   }
 
   public void onUserSuspension(long suspendedUser) {
 
-    System.out.println("onUserSuspension user:@" + suspendedUser);
+    System.out.println("onUserSuspension User:@" + suspendedUser);
   }
 
   public void onBlock(User source, User blockedUser) {

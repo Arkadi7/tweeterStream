@@ -1,20 +1,20 @@
 package twitter;
 
-import model.Tweet;
+import model.myDTO;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class MessageStorageTesting {
 
-    private List<Tweet> storage = new ArrayList<>();
+    private List<myDTO> storage = new ArrayList<>();
 
     public void count(){
 
         System.out.println(storage.size());
     }
 
-    public void put(Tweet message) {
+    public void put(myDTO message) {
         storage.add( message );
         System.out.println(message.toString());
     }

@@ -1,32 +1,35 @@
 package model;
 
 public class Tweet {
-String id;
-String Text;
 
-  public Tweet(String id, String text) {
+  private String text;
+  private String created_at;
 
-    this.id = id;
-    Text = text;
+
+  public Tweet(String text, String created_at) {
+
+    this.text = text;
+    this.created_at = created_at;
+
   }
 
-  public String getId() {
+  public String getCreated_at() {
 
-    return id;
+    return created_at;
   }
 
-  public void setId(String id) {
+  public void setCreated_at(String created_at) {
 
-    this.id = id;
+    this.created_at = created_at;
   }
 
   public String getText() {
 
-    return Text;
+    return text;
   }
 
   public void setText(String text) {
 
-    Text = text;
+    this.text = text;
   }
 }

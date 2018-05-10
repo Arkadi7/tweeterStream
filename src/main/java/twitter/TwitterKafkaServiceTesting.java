@@ -16,7 +16,7 @@ public class TwitterKafkaServiceTesting {
     FilterQuery tweetFilterQuery = new FilterQuery();
     twitterStream = new TwitterStreamFactory(configuration.build()).getInstance();
     twitterStream.addListener(new ProducerTesting(kafkaProducer));
-    //tweetFilterQuery.track("London", "Berlin", "Moscow");
+    tweetFilterQuery.track("London", "Berlin", "Moscow", "Paris", "Krakow","is","the","to","for","and","a");
     tweetFilterQuery.language("en");
     streamToKafka(tweetFilterQuery);
 
